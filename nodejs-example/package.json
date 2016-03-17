@@ -1,11 +1,15 @@
 {
   "name": "nodejs-example",
   "version": "1.0.0",
-  "description": "",
+  "description": "Examples for the machine learning open course",
   "main": "blogPosts.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "pieroit",
+  "license": "GPL",
+  "dependencies": {
+    "natural": "^0.4.0",
+    "underscore": "^1.8.3"
+  }
 }
