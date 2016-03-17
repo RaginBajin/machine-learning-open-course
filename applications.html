@@ -16,6 +16,7 @@
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/moon.css" id="theme">
+        <link rel="stylesheet" href="css/pieroit.css">
 
 		<!-- Code syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -44,103 +45,99 @@
                 <!-- Intro -->
 				<section>
 					<h1><a href="index.html">Machine Learning</a></h1>
-                    <h2>Applications</h2>
-					<p>
-					</p>
+                    <h2>Applications and practices</h2>
 				</section>
 
                 <!-- Summary of web applications -->
 				<section>
 					<h2>Main applications for the web</h2>
 					<ul>
-                        <li>Recommendation</li>
-                        <li>Segmentation</li>
-                        <li>Optimization</li>
                         <li>Classification</li>
+                        <li>Regression</li>
+                        <li>Clustering</li>
+                        <li>Recommendation</li>
 					</ul>
 				</section>
-                
-                <!-- Recommendation -->
-                <section>
-                    <h2>Recommendation</h2>
-                    <p>
-                        USER BASED vs. ITEM BASED</br>
-                        GRAPH APPROACHES
-                    </p>
-                </section>
-                
-                <!-- Segmentation -->
-                <section>
-                    <h2>Segmentation</h2>
-                    <p>
-                        PERSONAS</br>
-                        CLUSTERING
-                    </p>
-                </section>
-                
-                <!-- Optimization -->
-                <section>
-                    <h2>Optimization</h2>
-                    <p>
-                        DON'T KNOW
-                    </p>
-                </section>
                 
                 <!-- Classification -->
                 <section>
                     <h2>Classification</h2>
-                    <p>
-                        BAYES APPROACH</br>
-                        DISTANCE
-                    </p>
+                    <div>example: Sentiment analysis</div>
+                    <a href="https://en.wikipedia.org/wiki/Sentiment_analysis">
+                        <img src="img/twitter.png" />
+                    </a>
+                </section>
+                
+                <!-- Regression -->
+                <section>
+                    <h2>Regression</h2>
+                    <div>example: Price estimation</div>
+                    <a href="https://en.wikipedia.org/wiki/Regression_analysis">
+                        <img height="400px" src="img/regression.png" />
+                    </a>
+                </section>
+                
+                <!-- Clustering -->
+                <section>
+                    <h2>Clustering</h2>
+                    <div>example: Personas</div>
+                    <a href="https://en.wikipedia.org/wiki/Cluster_analysis">
+                        <img height="400px" src="img/clustering.png" />
+                    </a>
+                </section>
+                
+                <!-- Recommendation -->
+                <section>
+                    <h2>Recommendation</h2>
+                    <div>example: Collaborative filtering</div>
+                    <a href="https://en.wikipedia.org/wiki/Collaborative_filtering">
+                        <img src="img/collaborative_filtering.png" />
+                    </a>
                 </section>
                 
                 <!-- Difficulties in developing models -->
-				<section>
-					<h2>Issues</h2>
-					<ul>
-                        <li>Data: "garbage in, garbage out"</li>
-                        <li>Model: "nobody is perfect"</li>
-					</ul>
+				<section data-background="img/facepalm.jpg">
+                    <div class="white">
+                        <h2>Issues</h2>
+                        <ul>
+                            <li>Data: "garbage in, garbage out"</li>
+                            <li>Model: "nobody is perfect"</li>
+                        </ul>
+                    </div>
 				</section>
                 
                 <!-- Data difficulties -->
-                <section>
-					<h2>Data issues</h2>
-                    <section>
-                        <p>
-                            DATA HARVEST (quantity)
-                        </p>
-                    </section>
-                    <section>
-                        <p>
-                            CLEANING (quality)
-                        </p>
-                    </section>
-                    <section>
-                        <p>
-                            INTEGRATION (pertinency)
-                        </p>
-                    </section>
+                <section data-background="img/wikidata.png">
+                    <div class="white">
+                        <h2>Data issues</h2>
+                        <ul>
+                            <li>Harvest (quantity)</li>
+                            <li>Cleaning (quality)</li>
+                            <li>Integration (pertinency)</li>
+                        </ul>
+                    </div>
 				</section>
                 
                 <!-- Model difficulties -->
                 <section>
 					<h2>Model issues</h2>
                     <section>
-                        <p>
-                            ALGORITHM CHOICE (hammer for the nails)
-                        </p>
+                        <div>Choosing an algorithm</div>
+                        <a href="https://www.flickr.com/photos/justinbaeder/5317820857">
+                            <img src="img/hammer.png" />
+                        </a>
                     </section>
                     <section>
-                        <p>
-                            MODEL TUNING (improving performance) --> LOG PLOT
-                        </p>
+                        <div>Reaching 100% accuracy?</div>
+                        <a href="http://www.computerworld.com/article/3023708/data-analytics/the-machine-learning-problem-of-the-next-decade.html">
+                            <img src="img/model_improving.png" />
+                        </a>
+                        <div>
+                            <small>by <a href="http://www.crowdflower.com/">Crowdflower</a></small>
+                        </div>
                     </section>
                     <section>
-                        <p>
-                            MODEL PRODUCTION (go live and update)
-                        </p>
+                        <div>Go live and update</div>
                     </section>
 				</section>
                 

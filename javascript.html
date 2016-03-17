@@ -16,6 +16,7 @@
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/moon.css" id="theme">
+        <link rel="stylesheet" href="css/pieroit.css">
 
 		<!-- Code syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -45,17 +46,9 @@
 				<section>
                     <h1><a href="index.html">Machine Learning</a></h1>
                     <h2>Javascript</h2>
-					<p>
-                        
-					</p>
-				</section>
-
-                <!-- What's next -->
-				<section>
-					<h2>Look around and dive</h2>
 					<ul>
                         <li>Overview of open source libraries</li>
-                        <li>Recommend and classify blog posts</li>
+                        <li>Recommend textual content</li>
 					</ul>
 				</section>
                 
@@ -63,52 +56,124 @@
                 <section>
                     <h2>Open source libs</h2>
                     <ul>
+                        <li>Natural</li>
                         <li>ConvNetJS</li>
-                        <li>NaturalNode</li>
-                        <li>Numeric?</li>
+                        <li>(statistics libs)</li>
                         <li>???</li>
 					</ul>
                 </section>
                 
-                <!-- Example -->
                 <section>
-                    <h2>Let's write a model</h2>
+                    <section>
+                        <a href="https://github.com/NaturalNode/natural">
+                            <img width="100%" src="img/naturalJS.png" />
+                        </a>
+                    </section>
+                    <section>
+                        <pre class="stretch"><code class="hljs" data-trim>
+var natural = require('natural'),
+    classifier = new natural.BayesClassifier();
+
+
+classifier.addDocument('my unit-tests failed.', 'software');
+classifier.addDocument('tried the program, but it was buggy.', 'software');
+classifier.addDocument('the drive has a 2TB capacity.', 'hardware');
+classifier.addDocument('i need a new power supply.', 'hardware');
+
+classifier.train();
+
+classifier.save('classifier.json', function(err, classifier) {
+    // the classifier is saved to the classifier.json file!
+    
+    natural.BayesClassifier.load('classifier.json', null, function(err, classifier) {
+        console.log(classifier.classify('did you buy a new drive?'));
+    });
+});
+                        </code></pre>
+                    </section>
+                </section>
+                
+                <section>
+                    <section>
+                        <a href="http://cs.stanford.edu/people/karpathy/convnetjs/">
+                            <img width="100%" src="img/convnetjs.png" />
+                        </a>
+                    </section>
+                    <section>
+                        <div>"The Deep Learning Conspiracy"</div>
+                        <a href="http://www.kdnuggets.com/wp-content/uploads/photo.jpg">
+                            <img width="100%" src="img/deep_learning_conspiracy.jpg" />
+                        </a>
+                    </section>
+                </section>
+                
+                <!-- Statistics libs -->
+                <section>
+                    <a href="http://simplestatistics.org/">
+                        <img width="100%" src="img/simplestatisticsjs.png" />
+                    </a>
+                </section>
+                <section>
+                    <a href="http://jstat.github.io/">
+                        <img width="100%" src="img/jstat.png" />
+                    </a>
+                </section>
+                
+                <section>
+                    <h2>Takeaway</h2>
                     <ul>
-                        <li>Data gathering and cleaning</li>
-                        Prendi un gruppo di testi divisi in categorie
-                        <li>Build a model</li>
-                        Costruisci un grafo di similarità
-                        <li>Recommend</li>
-                        Dato un nuovo testo, dammi quelli simili
-                        <li>Classify</li>
-                        Dato un nuovo testo, categorizzalo
+                        <li>Algorithm vs. Model</li>
+                        <li>Javascript is good to run the Model</li>
 					</ul>
                 </section>
                 
+                <!-- Example -->
+                <section data-background="img/graph_viz.png" class="white">
+                    <h2>Let's write a model</h2>
+                    <ul>
+                        <li>Data gathering and cleaning</li>
+                        <li>Algorithm choice</li>
+                        <li>Model training</li>
+                        <li>Recommend</li>
+					</ul>
+                </section>
+                
+                <section>
+                    <h2>Get data</h2>
+                    <div>Italian food</div>
+                    <pre><code class="hljs" data-trim>
+SELECT DISTINCT ?id ?label ?content WHERE {
+    ?id a dbo:Food .
+    ?id dbo:origin dbr:Italy .
+    ?id dbo:abstract ?content .
+    ?id rdfs:label ?label .
+
+    FILTER(LANG(?label) = "en")
+    FILTER(LANG(?content) = "en")
+} LIMIT 10000
+                    </code></pre>
+                    <a href="http://dbpedia.org/sparql">
+                        Run on dbPedia
+                    </a>
+                </section>                
                 
                 <!-- Measuring similarity between texts -->
-				<section>
-					<h2>Text similarity</h2>
-					<section>
-                        <h3>Dice/Tanimoto coefficient</h3>
-                        <p>
-                            MATH BABY --> PICTURE
-                        </p>
+				<section>                    
+                    <section>
+                        <h2>Algorithm</h2>
+                        <div>Jaccard/Tanimoto index</div>
+                        <img src="img/tanimoto.png" />
                     </section>
                     <section>
-                        <h3>Dice/Tanimoto in JS</h3>
-                        <pre><code class="hljs" data-trim contenteditable>
-var similarity = function( bagA, bagB ) {
-    
+                        <h2>Algorithm</h2>
+                        <div>Jaccard/Tanimoto index</div>
+                        <pre><code class="hljs" data-trim>
+function similarity( bagA, bagB ) {
+
+    var nIntersection = _.intersection( bagA, bagB).length;
     var nUnion        = _.union( bagA, bagB ).length;
-    var nIntersection = _.interseczz?( bagA, bagB ).length;
 
-    if( nUnion === 0 ) {
-        return 0;
-    } else {
-        return nIntersection / nUnion;
-    }
-
+    return nIntersection / nUnion;
 };
                         </code></pre>
                     </section>
@@ -116,27 +181,32 @@ var similarity = function( bagA, bagB ) {
                 
                 <!-- Build similarity graph -->
 				<section>
-					<h2>Similarity graph</h2>
-					<section>
-                        <h3>Add text one by one</h3>
-                        <p>
-                            AAAAAAAAAH
-                        </p>
-                    </section>
-                    <section>
-                        <h3>Code skillz</h3>
-                        <pre><code class="hljs" data-trim contenteditable>
-var addNode = function( text, category ) {
-    
-    BEL MACELLO
-
+                    <h2>Similarity graph</h2>
+                    <span>
+                        <img height="200px" src="img/similarity_graph.jpg" />
+                    </span>
+                    <pre><code class="hljs" data-trim contenteditable>
+var similarityGraph =  {
+    "A":{
+            "B": 0.1,
+            "C": 0.8,
+        },
+    "B":{
+            "A": 0.1,
+            "C": 0.5,
+        },
+    "C":{
+            "A": 0.8,
+            "B": 0.5,
+        }
 };
-                        </code></pre>
-                    </section>
+                    </code></pre>
 				</section>
                 
-
-			</div>
+                <!-- Demo -->
+				<section>
+                    <img width="800px" src="img/demo.jpg" />
+    			</section>
 
 		</div>
 

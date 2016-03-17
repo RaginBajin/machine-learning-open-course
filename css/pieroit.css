@@ -1,0 +1,22 @@
+b {
+    color: #eee;
+}
+
+.white {
+    color: #111;
+    background-color: white;
+}
+
+.white h1, .white h2, .white h3 {
+    color: #111;
+}
+
+.reveal section img {
+    border: none;
+    box-shadow:none;
+}
+
+.half {
+    width: 50%;
+    float: left;
+}
