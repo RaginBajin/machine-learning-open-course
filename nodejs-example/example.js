@@ -21,8 +21,8 @@ _.times(10, function(){
     
 var newPost = {
     "id"      : "a-new-post",
-    //"content" : "We invented a pasta dish with bacon, black pepper, eggs and cheese"
-    "content" : "tagliolini with nutella"
+    "content" : "We invented a pasta dish with bacon, black pepper, eggs and cheese"
+    //"content" : "Cristhmas sweet with chocolate"
 };
 reply = model.test(newPost);
 console.log("\n recommend for new post \n", newPost, "\n\t", reply);
