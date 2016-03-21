@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Machine Learning - Javascript</title>
+		<title>Machine Learning - WordPress</title>
 
 		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
 		<meta name="author" content="Hakim El Hattab">
@@ -41,59 +41,122 @@
 
 		<div class="reveal">
 
-			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
                 
                 <!-- Intro -->
 				<section>
                     <h1><a href="index.html">Machine Learning</a></h1>
-                    <h2>Javascript</h2>
+                    <div class="white">
+                        <img src="img/wordpress_logo_long.png" />
+                    </div>
+                    <br />
 					<ul>
-                        <li>Overview of open source libraries</li>
-                        <li>Recommend textual content</li>
+                        <li>What is useful for</li>
+                        <li>How to integrate</li>
+                        <li>Available plugins</li>
+                        <li>A little code</li>
 					</ul>
 				</section>
                 
-                <!-- Panorama -->
+                <!-- Applications for WP -->
                 <section>
-                    <h2>Open source libs</h2>
+                    <h2>Applications</h2>
+                    <div>(mostly for text)</div>
+                    <br />
                     <ul>
-                        <li>Natural</li>
-                        <li>ConvNetJS</li>
-                        <li>(statistics libs)</li>
-                        <li>???</li>
+                        <li>Anti-spam</li>
+                        <li>Post recommendation</li>
+                        <li>Post classification</li>
+                        <li>Text analysis</li>
+                        <li>Speech recognition</li>
+                        <li>A/B testing</li>
+                        <li>User login?</li>
 					</ul>
                 </section>
                 
+                <!-- Available plugins -->
                 <section>
+                    <h2>Available plugins</h2>
                     <section>
-                        <a href="https://github.com/NaturalNode/natural">
-                            <img width="100%" src="img/naturalJS.png" />
+                        <a href="https://wordpress.org/plugins/akismet/">
+                            <img src="img/akismet.png" width="100%" />
                         </a>
                     </section>
                     <section>
-                        <pre class="stretch"><code class="hljs" data-trim>
-var natural = require('natural'),
-    classifier = new natural.BayesClassifier();
-
-
-classifier.addDocument('my unit-tests failed.', 'software');
-classifier.addDocument('tried the program, but it was buggy.', 'software');
-classifier.addDocument('the drive has a 2TB capacity.', 'hardware');
-classifier.addDocument('i need a new power supply.', 'hardware');
-
-classifier.train();
-
-classifier.save('classifier.json', function(err, classifier) {
-    // the classifier is saved to the classifier.json file!
-    
-    natural.BayesClassifier.load('classifier.json', null, function(err, classifier) {
-        console.log(classifier.classify('did you buy a new drive?'));
-    });
-});
-                        </code></pre>
+                        <a href="https://wordpress.org/plugins/wordlift/">
+                            <img src="img/wordlift.png" width="100%" />
+                        </a>
+                    </section>
+                    <section>
+                        <a href="https://wordpress.org/plugins/yet-another-related-posts-plugin/">
+                            <img src="img/yarpp.png" width="100%" />
+                        </a>
                     </section>
                 </section>
+                
+                <!-- How to integrate -->
+                <section>
+                    <section class="white">
+                        <h2>Integration</h2>
+                        <ul>
+                            <li>As a <strong>native</strong> plugin</li>
+                            <li>As a wrapper for <strong>external</strong> services</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="white">
+                        <h3>Native</h3>
+                        <ul>
+                            <li style="color:green">Everything inside your installation</li>
+                            <li style="color:green">Total control</li>
+                            <li style="color:darkred">No PHP machine learning libraries</li>
+                            <li style="color:darkred">Training in PHP is slow</li>
+                        </ul>
+                    </section>
+                    <section class="white">
+                        <h3>External</h3>
+                        <ul>
+                            <li style="color:green">Performance</li>
+                            <li style="color:green">No stress</li>
+                            <li style="color:darkred">Pay</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <img src="img/make_your_choice.jpg" width="600px">
+                    </section>
+                </section>
+                
+                <!-- Measuring similarity between texts -->
+				<section>                    
+                    <section>
+                        <h2>Algorithm</h2>
+                        <div>Jaccard/Tanimoto index</div>
+                        <img src="img/tanimoto.png" />
+                    </section>
+                    <section>
+                        <h2>Algorithm</h2>
+                        <div>Jaccard/Tanimoto index</div>
+                        <pre><code class="hljs" data-trim>
+COMPUTE SIMILARITY AT POST SAVE
+                        </code></pre>
+                    </section>
+				</section>
+                
+                <!-- Build similarity graph -->
+				<section>
+                    <h2>Similarity graph</h2>
+                    <span>
+                        <img height="200px" src="img/similarity_graph.jpg" />
+                    </span>
+                    <pre><code class="hljs" data-trim contenteditable>
+INSERT SIMILARITY AS A POST META
+                    </code></pre>
+				</section>
+                
+                <!-- Demo -->
+				<section>
+                    <img width="800px" src="img/demo.jpg" />
+    			</section>
 
 		</div>
 
