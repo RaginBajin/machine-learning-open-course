@@ -14,6 +14,8 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
+        <link rel="icon"  type="image/x-icon" href="favicon.ico">
+        
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/moon.css" id="theme">
         <link rel="stylesheet" href="css/pieroit.css">
@@ -92,121 +94,6 @@ classifier.save('classifier.json', function(err, classifier) {
                         </code></pre>
                     </section>
                 </section>
-                
-                <section>
-                    <section>
-                        <a href="http://cs.stanford.edu/people/karpathy/convnetjs/">
-                            <img width="100%" src="img/convnetjs.png" />
-                        </a>
-                    </section>
-                    <section>
-                        <div>"The Deep Learning Conspiracy"</div>
-                        <a href="http://www.kdnuggets.com/wp-content/uploads/photo.jpg">
-                            <img width="100%" src="img/deep_learning_conspiracy.jpg" />
-                        </a>
-                    </section>
-                </section>
-                
-                <!-- Statistics libs -->
-                <section>
-                    <a href="http://simplestatistics.org/">
-                        <img width="100%" src="img/simplestatisticsjs.png" />
-                    </a>
-                </section>
-                <section>
-                    <a href="http://jstat.github.io/">
-                        <img width="100%" src="img/jstat.png" />
-                    </a>
-                </section>
-                
-                <section>
-                    <h2>Takeaway</h2>
-                    <ul>
-                        <li>Algorithm vs. Model</li>
-                        <li>Javascript is good to run the Model</li>
-					</ul>
-                </section>
-                
-                <!-- Example -->
-                <section data-background="img/graph_viz.png" class="white">
-                    <h2>Let's write a model</h2>
-                    <ul>
-                        <li>Data gathering and cleaning</li>
-                        <li>Algorithm choice</li>
-                        <li>Model training</li>
-                        <li>Recommend</li>
-					</ul>
-                </section>
-                
-                <section>
-                    <h2>Get data</h2>
-                    <div>Italian food</div>
-                    <pre><code class="hljs" data-trim>
-SELECT DISTINCT ?id ?label ?content WHERE {
-    ?id a dbo:Food .
-    ?id dbo:origin dbr:Italy .
-    ?id dbo:abstract ?content .
-    ?id rdfs:label ?label .
-
-    FILTER(LANG(?label) = "en")
-    FILTER(LANG(?content) = "en")
-} LIMIT 10000
-                    </code></pre>
-                    <a href="http://dbpedia.org/sparql">
-                        Run on dbPedia
-                    </a>
-                </section>                
-                
-                <!-- Measuring similarity between texts -->
-				<section>                    
-                    <section>
-                        <h2>Algorithm</h2>
-                        <div>Jaccard/Tanimoto index</div>
-                        <img src="img/tanimoto.png" />
-                    </section>
-                    <section>
-                        <h2>Algorithm</h2>
-                        <div>Jaccard/Tanimoto index</div>
-                        <pre><code class="hljs" data-trim>
-function similarity( bagA, bagB ) {
-
-    var nIntersection = _.intersection( bagA, bagB).length;
-    var nUnion        = _.union( bagA, bagB ).length;
-
-    return nIntersection / nUnion;
-};
-                        </code></pre>
-                    </section>
-				</section>
-                
-                <!-- Build similarity graph -->
-				<section>
-                    <h2>Similarity graph</h2>
-                    <span>
-                        <img height="200px" src="img/similarity_graph.jpg" />
-                    </span>
-                    <pre><code class="hljs" data-trim contenteditable>
-var similarityGraph =  {
-    "A":{
-            "B": 0.1,
-            "C": 0.8,
-        },
-    "B":{
-            "A": 0.1,
-            "C": 0.5,
-        },
-    "C":{
-            "A": 0.8,
-            "B": 0.5,
-        }
-};
-                    </code></pre>
-				</section>
-                
-                <!-- Demo -->
-				<section>
-                    <img width="800px" src="img/demo.jpg" />
-    			</section>
 
 		</div>
 
