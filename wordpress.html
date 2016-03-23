@@ -52,8 +52,8 @@
                     <br />
 					<ul>
                         <li>What is useful for</li>
-                        <li>How to integrate</li>
                         <li>Available plugins</li>
+                        <li>How to integrate</li>
                         <li>A little code</li>
 					</ul>
 				</section>
@@ -111,6 +111,7 @@
                             <li style="color:green">Total control</li>
                             <li style="color:darkred">No PHP machine learning libraries</li>
                             <li style="color:darkred">Training in PHP is slow</li>
+                            <li style="color:darkred">CMS not good for training</li>
                         </ul>
                     </section>
                     <section class="white">
@@ -118,7 +119,21 @@
                         <ul>
                             <li style="color:green">Performance</li>
                             <li style="color:green">No stress</li>
-                            <li style="color:darkred">Pay</li>
+                            <li style="color:darkred">Pay or maintain another system</li>
+                        </ul>
+                    </section>
+                    <section class="white">
+                        <h2>Takeaway</h2>
+                        <ul>
+                            <li>
+                                <h3 style="color:darkred">Training/Algorithm (WP KO)</h3>
+                            </li>
+                            <li>
+                                <h3 style="color:green">Model (WP OK)</h3>
+                            </li>
+                            <li>
+                                <h3>Rest API is our friend</h3>
+                            </li>
                         </ul>
                     </section>
                     <section>
@@ -126,31 +141,131 @@
                     </section>
                 </section>
                 
-                <!-- Measuring similarity between texts -->
-				<section>                    
+                <!-- Example recommendation plugin for WP-->
+                <section data-background="img/graph_viz.png" class="white">
+                    <h2>Let's write a model</h2>
+                    <ul>
+                        <li><strong>Data:</strong> blog posts</li>
+                        <li><strong>Algorithm:</strong> text similarity</li>
+                        <li><strong>Model:</strong> graph stored in <code>wp_postmeta</code></li>
+                        <li><strong>Recommend!</strong></li>
+					</ul>
+                </section>
+                
+				<section>
+                    <h2>Algorithm</h2>
                     <section>
-                        <h2>Algorithm</h2>
                         <div>Jaccard/Tanimoto index</div>
-                        <img src="img/tanimoto.png" />
+                        <img width="80%" src="img/tanimoto_php.png" />
                     </section>
                     <section>
-                        <h2>Algorithm</h2>
                         <div>Jaccard/Tanimoto index</div>
-                        <pre><code class="hljs" data-trim>
-COMPUTE SIMILARITY AT POST SAVE
+                        <pre><code class="hljs php" data-trim>
+public static function similarity( $post_id_a, $post_id_b ) {
+
+    // Transform each post in a bag of words
+    $bow_a = self::post_2_bag_of_words( $post_id_a );
+    $bow_b = self::post_2_bag_of_words( $post_id_b );
+
+    // Compute Tanimoto
+    $intersection = array_unique( array_intersect( $bow_a, $bow_b ) );
+    $union        = array_unique( array_merge( $bow_a, $bow_b ) );
+
+    return count( $intersection ) / count( $union );
+}
                         </code></pre>
+                    </section>
+                    <section>
+                        <div>Bag of Words</div>
+                        <pre><code class="hljs php" data-trim>
+public static function post_2_bag_of_words( $post_id ) {
+		
+    $post = get_post( $post_id );
+
+    // Take away HTML
+    $post_content  = $post->post_content;
+    $clean_content = strtolower( wp_strip_all_tags( $post_content ) );
+    
+    // Take away punctuation
+    $clean_content = str_replace( array(".", ",", ":", ";", "!", "?", "'", '"', "(", ")" ), "", $clean_content );
+    
+    // Split tokens
+    $tokens = array_unique( explode( " ", $clean_content ) );
+
+    // Take away stopwords
+    return array_diff( $tokens, self::$stopwords );
+}
+                        </code></pre>                        
                     </section>
 				</section>
                 
                 <!-- Build similarity graph -->
 				<section>
                     <h2>Similarity graph</h2>
-                    <span>
-                        <img height="200px" src="img/similarity_graph.jpg" />
-                    </span>
-                    <pre><code class="hljs" data-trim contenteditable>
-INSERT SIMILARITY AS A POST META
-                    </code></pre>
+                    <section>
+                        <span>
+                            <img width="100%" src="img/similarity_graph.jpg" />
+                        </span>
+                    </section>
+                    <section>
+                        <span>
+                            <img width="100%" src="img/wp_recommendations_post_meta.png" />
+                        </span>
+                    </section>
+                    <section>
+                        <pre style="width:100%"><code class="hljs php" data-trim contenteditable>
+function dropout_update_recommendations( $post_id ) {
+	
+	// Take latest 10 posts
+	$latest_posts = wp_get_recent_posts(
+		array(
+			'numberposts' => 10,
+			'post_type'   => array( 'post', 'page' )
+		)
+	);
+	$similarities = array();
+	
+	foreach( $latest_posts as $another_post ){
+		
+		if( $another_post['ID'] !== $post_id ) {
+			
+			// Measure similarity
+			$similarity = Dropout::similarity( $post_id, $another_post['ID'] );
+			$similarities[ $another_post['ID'] ] = $similarity;
+
+			// Update similarities for the other post
+			$already_computed_similarities = get_post_meta( $another_post['ID'], 'dropout_recommendations', true );
+			$already_computed_similarities[$post_id] = $similarity;
+			update_post_meta( $another_post['ID'], 'dropout_recommendations', $already_computed_similarities );
+		}
+	}
+	
+	// Save recommendations for this post
+	update_post_meta( $post_id, 'dropout_recommendations', $similarities );
+}
+add_action( 'save_post', 'dropout_update_recommendations' );
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="hljs php" data-trim contenteditable>
+function dropout_get_recommendations( $content ) {
+	
+	$recommendations = get_post_meta( get_the_ID(), 'dropout_recommendations', true );
+	
+	arsort( $recommendations );        // Sort by similarity
+
+	$html = '<h3>See also</h3><ul>';
+	foreach( $recommendations as $recom_id => $similarity ) {
+		$recom_post = get_post( $recom_id );
+		$html .= '<li><a href="' . get_permalink($recom_post->ID) . '">' . $recom_post->post_title . '</a> (' . $similarity .')</li>';
+	}
+	$html .= '</ul>';
+	
+	return $content . $html;
+}
+add_filter( 'the_content', 'dropout_get_recommendations' );
+                        </code></pre>
+                    </section>
 				</section>
                 
                 <!-- Demo -->
