@@ -13,3 +13,8 @@ Enjoy the slides directly [online](http://pieroit.github.io/machine-learning-ope
 
 - Node: Enter in `nodejs-example` and run `npm install`. Then launch with `node example.js` or `node naturalDemo.js`.
 - WordPress: Download [this repo](https://github.com/pieroit/dropout-plugin). Rename the `src` folder to `dropout` and upload it in `wp-content/plugins` as you would do with any plugin.
+
+## Live talks
+
+[![image](https://cloud.githubusercontent.com/assets/6328377/13988274/83b2a478-f10b-11e5-9e9f-cf60292811b1.png)](https://www.youtube.com/watch?v=8zStOEPDOQQ)
+
