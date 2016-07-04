@@ -1,3 +1,4 @@
+*.*~
 .DS_Store
 .svn
 log/*.log
@@ -8,3 +9,4 @@ css/reveal.min.css
 js/reveal.min.js
 nbproject
 nodejs/example&node_modules/
+spark-example/data
