@@ -89,7 +89,6 @@ if __name__ == '__main__':
     # configure cluster
     conf = SparkConf()
     conf.set("spark.master", "local[*]")
-    #conf.set("spark.driver.memory", "8g")
 
     # get context
     sc = SparkContext(conf=conf)
