@@ -10,3 +10,4 @@ js/reveal.min.js
 nbproject
 nodejs/example&node_modules/
 spark-example/data
+spark-example/.idea

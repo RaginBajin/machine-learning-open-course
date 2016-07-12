@@ -39,7 +39,7 @@ def computeSimilarity(twoUsers):
     userAprofile = userA['profile']
     userBprofile = userB['profile']
 
-    print '\n'
+    #print '\n'
     #print colored(userA['user'], 'yellow')
     #print colored( userAprofile, 'blue')
     #print colored(userB['user'], 'yellow')
@@ -89,6 +89,7 @@ if __name__ == '__main__':
     # configure cluster
     conf = SparkConf()
     conf.set("spark.master", "local[*]")
+    #conf.set("spark.driver.memory", "8g")
 
     # get context
     sc = SparkContext(conf=conf)
@@ -101,34 +102,31 @@ if __name__ == '__main__':
     userProfiles = sc.textFile(fileName) \
         .filter(lambda line: not 'userId' in line) \
         .map(buildRatingFromLine) \
-        .groupBy(lambda rating: rating['user']) \
+        .groupBy(lambda profile: profile['user']) \
         .map(buildProfileFromGroup) \
         .cache()
 
+    # keep a list of user IDs for later
+    userIds = userProfiles.map(lambda profile: profile['user']) \
+        .collect()
+
     # compute similarity between users' profiles
     similarityGraph = userProfiles.cartesian(userProfiles) \
-        .take(10000)
-        # TODO cut here
-    similarityGraph = sc.parallelize(similarityGraph) \
         .map(computeSimilarity) \
         .filter(lambda similarity: similarity != None) \
-        .groupBy(lambda similarity: similarity['user']) \
-        .take(100)
+        .cache()
 
+    # take recommendations from the most similar users
     finalRecommendations = {}
-    for sim in similarityGraph:
+    for userId in userIds:
 
-        userId = sim[0]
-        recommendations = sim[1]
-        print colored(sim, 'yellow')
-
-        userRec = sc.parallelize(recommendations) \
+        kNearestNeighBours = similarityGraph.filter(lambda rec: rec['user'] == userId) \
             .sortBy(lambda rec: rec['similarity'], ascending=False) \
             .take(10)
 
-        for uRec in userRec:
+        for neighbour in kNearestNeighBours:
 
-            recsFromUser = set(uRec['recommendations'])
+            recsFromUser = set(neighbour['recommendations'])
 
             if not userId in finalRecommendations:
                 finalRecommendations[userId] = recsFromUser
