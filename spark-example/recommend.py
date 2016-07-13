@@ -87,7 +87,6 @@ if __name__ == '__main__':
     userProfiles = sc.textFile(fileName) \
         .filter(lambda line: not 'userId' in line) \
         .map(buildRatingFromLine) \
-        .filter(lambda rating: rating['rating'] == 5.0) \
         .groupBy(lambda profile: profile['user']) \
         .map(buildProfileFromGroup) \
         .cache()
@@ -100,7 +99,7 @@ if __name__ == '__main__':
     similarityGraph = userProfiles.cartesian(userProfiles) \
         .map(computeSimilarity) \
         .filter(lambda similarity: similarity != None) \
-        .filter(lambda similarity: similarity['similarity'] > 0.01) \
+        .filter(lambda similarity: similarity['similarity'] > 0.03) \
         .cache()
 
     # take recommendations from the most similar users
@@ -113,7 +112,11 @@ if __name__ == '__main__':
             .sortBy(lambda rec: rec['similarity'], ascending=False) \
             .take(10)
 
+        print kNearestNeighBours
+
         finalRecommendations[userId] = getRecommendationsFromKNN( kNearestNeighBours )
+
+        #break
 
     # save to file
     print colored(finalRecommendations, 'green')

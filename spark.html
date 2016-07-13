@@ -53,7 +53,7 @@
                     <br/>
 					<ul>
                         <li>MLlib overview</li>
-                        <li>XXXXXXXXXX</li>
+                        <li>Collaborative filtering</li>
 					</ul>
 				</section>
                 
@@ -62,154 +62,257 @@
                     <a target="_blank" href="http://spark.apache.org/docs/latest/mllib-guide.html">
                         <img width="30%" src="img/spark_MLlib.png" />
                     </a>
+                    <div><a target="_blank" href="http://spark.apache.org/docs/latest/mllib-collaborative-filtering.html">ALS</a> too advanced! Let's go simpler</div>
                 </section>
                 
-                <!-- Demo -->
-                <section>
-                    <section>
-                        <a href="https://github.com/NaturalNode/natural">
-                            <img width="100%" src="img/naturalJS.png" />
-                        </a>
-                    </section>
-                    <section>
-                        <pre class="stretch"><code class="hljs" data-trim>
-var natural = require('natural'),
-    classifier = new natural.BayesClassifier();
-
-
-classifier.addDocument('my unit-tests failed.', 'software');
-classifier.addDocument('tried the program, but it was buggy.', 'software');
-classifier.addDocument('the drive has a 2TB capacity.', 'hardware');
-classifier.addDocument('i need a new power supply.', 'hardware');
-
-classifier.train();
-
-classifier.save('classifier.json', function(err, classifier) {
-    // the classifier is saved to the classifier.json file!
-    
-    natural.BayesClassifier.load('classifier.json', null, function(err, classifier) {
-        console.log(classifier.classify('did you buy a new drive?'));
-    });
-});
-                        </code></pre>
-                    </section>
-                </section>
-                
-                <section>
-                    <section>
-                        <a href="http://cs.stanford.edu/people/karpathy/convnetjs/">
-                            <img width="100%" src="img/convnetjs.png" />
-                        </a>
-                    </section>
-                    <section>
-                        <div>"The Deep Learning Conspiracy"</div>
-                        <a href="http://www.kdnuggets.com/wp-content/uploads/photo.jpg">
-                            <img width="100%" src="img/deep_learning_conspiracy.jpg" />
-                        </a>
-                    </section>
-                </section>
-                
-                <!-- Statistics libs -->
-                <section>
-                    <a href="http://simplestatistics.org/">
-                        <img width="100%" src="img/simplestatisticsjs.png" />
-                    </a>
-                </section>
-                <section>
-                    <a href="http://jstat.github.io/">
-                        <img width="100%" src="img/jstat.png" />
-                    </a>
-                </section>
-                
-                <section>
-                    <h2>Takeaway</h2>
-                    <ul>
-                        <li>Algorithm vs. Model</li>
-                        <li>Javascript is good to run the Model</li>
-					</ul>
-                </section>
-                
-                <!-- Example -->
+                <!-- Example recommendation engine on Spark -->
                 <section data-background="img/graph_viz.png" class="white">
-                    <h2>Let's write a model</h2>
+                    <h2>Let's write a recommendation engine</h2>
                     <ul>
-                        <li>Data gathering and cleaning</li>
-                        <li>Algorithm choice</li>
-                        <li>Model training</li>
-                        <li>Recommend</li>
+                        <li><strong>Data:</strong> Movie ratings by <a target="_blank" href="http://grouplens.org/datasets/movielens/">MovieLens</a></li>
+                        <li><strong>Algorithm:</strong> <a target="_blank" href="https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm">k-nearest neighbors</a></li>
+                        <li><strong>Model:</strong> similarity graph</li>
+                        <li><strong>Recommend!</strong></li>
 					</ul>
                 </section>
                 
+                <!-- Data -->
                 <section>
-                    <h2>Get data</h2>
-                    <div>Italian food</div>
-                    <pre><code class="hljs" data-trim>
-SELECT DISTINCT ?id ?label ?content WHERE {
-    ?id a dbo:Food .
-    ?id dbo:origin dbr:Italy .
-    ?id dbo:abstract ?content .
-    ?id rdfs:label ?label .
-
-    FILTER(LANG(?label) = "en")
-    FILTER(LANG(?content) = "en")
-} LIMIT 10000
-                    </code></pre>
-                    <a href="http://dbpedia.org/sparql">
-                        Run on dbPedia
-                    </a>
-                </section>                
-                
-                <!-- Measuring similarity between texts -->
-				<section>                    
+                    <h2>Data</h2>
                     <section>
-                        <h2>Algorithm</h2>
-                        <div>Jaccard/Tanimoto index</div>
-                        <img src="img/tanimoto.png" />
-                    </section>
-                    <section>
-                        <h2>Algorithm</h2>
-                        <div>Jaccard/Tanimoto index</div>
-                        <pre><code class="hljs" data-trim>
-function similarity( bagA, bagB ) {
-
-    var nIntersection = _.intersection( bagA, bagB).length;
-    var nUnion        = _.union( bagA, bagB ).length;
-
-    return nIntersection / nUnion;
-};
+                        <h3>Ratings csv</h3>
+                        <pre><code class="hljs plain" data-trim>
+userId,movieId,rating,timestamp
+1,16,4.0,1217897793
+6,24,1.5,1217895807
+35,32,4.0,1217896246
+70,47,4.0,1217896556
+109,50,4.0,1217896523
+345,110,4.0,1217896150
+...
                         </code></pre>
                     </section>
+                    <section>
+                        <h3>Movies csv</h3>
+                        <pre><code class="hljs plain" data-trim>
+movieId,title,genres
+1,Toy Story (1995),Adventure|Animation|Children|Comedy|Fantasy
+2,Jumanji (1995),Adventure|Children|Fantasy
+3,Grumpier Old Men (1995),Comedy|Romance
+4,Waiting to Exhale (1995),Comedy|Drama|Romance
+5,Father of the Bride Part II (1995),Comedy
+6,Heat (1995),Action|Crime|Thriller
+7,Sabrina (1995),Comedy|Romance
+...
+                        </code></pre>
+                    </section>
+                </section>
+                
+                <!-- intuition -->
+				<section>
+                    <h2>Intuition</h2>
+                    <div>How do I find recommendations for an user?</div>
+                    <br/>
+					<ol>
+                        <li>Find most similar users</li>
+                        <li>Pick movies from them he still didn't watch</li>
+					</ol>
 				</section>
                 
-                <!-- Build similarity graph -->
-				<section>
-                    <h2>Similarity graph</h2>
-                    <span>
-                        <img height="200px" src="img/similarity_graph.jpg" />
-                    </span>
-                    <pre><code class="hljs" data-trim contenteditable>
-var similarityGraph =  {
-    "A":{
-            "B": 0.1,
-            "C": 0.8,
-        },
-    "B":{
-            "A": 0.1,
-            "C": 0.5,
-        },
-    "C":{
-            "A": 0.8,
-            "B": 0.5,
+                <!-- parse data -->
+                <section>
+                    <h2>Parse data</h2>
+                    <section>
+                        <pre><code class="hljs python" data-trim>
+# load file and build user profiles
+fileName = workingDir + "ratings.csv"
+userProfiles = sc.textFile(fileName) \
+    .filter(lambda line: not 'userId' in line) \
+    .map(buildRatingFromLine) \
+    .groupBy(lambda profile: profile['user']) \
+    .map(buildProfileFromGroup) \
+    .cache()
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="hljs python" data-trim>
+def buildRatingFromLine(l):
+
+    fields = l.split(',')
+
+    return {
+        'user'  : fields[0],
+        'movie' : fields[1],
+        'rating': float(fields[2])
+    }
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="hljs python" data-trim>
+def buildProfileFromGroup(g):
+
+    profile = {}
+    for rating in g[1]:
+        movieId = rating['movie']
+        profile[movieId] = rating['rating']
+
+    return {
+        'user'   : g[0],
+        'profile': profile
+    }
+                        </code></pre>
+                    </section>
+                    <section>
+                        <div>list of user profiles</div>
+                        <pre><code class="hljs js" data-trim>
+[
+    {
+        'user'   : 216,
+        'profile': {
+            '10': 3.5,
+            '34': 5.0,
+            ...
         }
-};
-                    </code></pre>
-				</section>
+    },
+    ...
+]
+                            </code></pre>
+                    </section>
+                </section>
+                
+                <!-- build similarity graph -->
+                <section>
+                    <h2>Similarity graph</h2>
+                    <section>
+                        <span>
+                            <img height="300px" src="img/similarity_graph.jpg" />
+                        </span>
+                    </section>
+                    <section>
+                        <img height="450px" src="img/tanimoto_movies.png" />
+                    </section>
+                    <section>
+                        <pre><code class="hljs python" data-trim>
+# compute similarity between users' profiles
+similarityGraph = userProfiles.cartesian(userProfiles) \
+    .map(computeSimilarity) \
+    .filter(lambda similarity: similarity != None) \
+    .cache()
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="hljs python" data-trim>
+def computeSimilarity(twoUsers):
+
+    userA = twoUsers[0]
+    userB = twoUsers[1]
+
+    # don't compare a user with himself
+    if(userA['user'] == userB['user']):
+        return None
+
+    userAprofile = userA['profile']
+    userBprofile = userB['profile']
+
+    moviesRatedByA = set(userAprofile.keys())
+    moviesRatedByB = set(userBprofile.keys())
+    moviesBothUsersRated = moviesRatedByA.intersection( moviesRatedByB )
+    moviesRated = moviesRatedByA.union( moviesRatedByB )
+    moviesOnlyBRated = moviesRatedByB.difference( moviesRatedByA )
+
+    similarity = float( len(moviesBothUsersRated) ) / float( len(moviesRated) )
+
+    return {
+        'user' : userA['user'],
+        'other': userB['user'],
+        'similarity' : similarity,
+        'recommendations': list(moviesOnlyBRated)
+    }
+                        </code></pre>
+                    </section>
+                    <section>
+                        <div>list of one-to-one recommendations</div>
+                        <pre><code class="hljs js" data-trim>
+[
+    {
+        'user' : 216,
+        'other': 306,
+        'similarity' : 0.83,
+        'recommendations': [236, 101, 45, ...]
+    },
+    ...
+]
+                            </code></pre>
+                    </section>
+                </section>
+                
+                <!-- Find kNN -->
+                <section>
+                    <h2>k-nearest neighbors</h2>
+                    <section>
+                        <div>get <em>k</em> most similar profiles for each user</div>
+                        <pre><code class="hljs python" data-trim>
+# take recommendations from the most similar users
+k = 10
+finalRecommendations = {}
+for i, userId in enumerate(userIds):
+
+    kNearestNeighBours = similarityGraph.filter(lambda rec: rec['user'] == userId) \
+        .sortBy(lambda rec: rec['similarity'], ascending=False) \
+        .take(k)
+
+    finalRecommendations[userId] = getRecommendationsFromKNN( kNearestNeighBours )
+
+                        </code></pre>
+                    </section>
+                    <section>
+                        <div>which movies are recommended by my neighbors?</div>
+                        <pre><code class="hljs python" data-trim>
+def getRecommendationsFromKNN(kNearestNeighBours):
+
+    recommendations = []
+    for i, neighbour in enumerate(kNearestNeighBours):
+
+        recsFromUser = set(neighbour['recommendations'])
+
+        if i == 0:
+            recommendations = recsFromUser
+        else:
+            unionSet = recommendations.intersection( recsFromUser )
+            if len(unionSet) > 1:
+                recommendations = unionSet
+
+        return list( recommendations )
+                        </code></pre>
+                    </section>
+                    <section>
+                        <div>list of ready recommendations!</div>
+                        <pre><code class="hljs js" data-trim>
+{
+    '216': [ '94', '402', '423', '232' ],
+    '344': [ '345', '2', '60', '142', '96' ], 
+    ...
+}
+                        </code></pre>
+                        <div>(to be loaded on DB)</div>
+                    </section>
+                </section>
+                
+                <!-- limitations -->
+                <section>
+                    <h2>Limitations...</h2>
+                    <ul>
+                        <li>not considering rating [0,5]</li>
+                        <li>not looking into movies' genre</li>
+                        <li>not looking into movies at all</li>
+                    </ul>
+                </section>
                 
                 <!-- Demo -->
 				<section>
                     <img width="800px" src="img/demo.jpg" />
                     <div>
-                        <a href="https://github.com/pieroit/machine-learning-open-course/tree/gh-pages/nodejs-example">Show me the code!</a>
+                        <a href="https://github.com/pieroit/machine-learning-open-course/tree/gh-pages/spark-example">Show me the code!</a>
                     </div>
     			</section>
 
