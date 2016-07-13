@@ -39,34 +39,13 @@ def computeSimilarity(twoUsers):
     userAprofile = userA['profile']
     userBprofile = userB['profile']
 
-    #print '\n'
-    #print colored(userA['user'], 'yellow')
-    #print colored( userAprofile, 'blue')
-    #print colored(userB['user'], 'yellow')
-    #print colored( userBprofile, 'blue')
-
     moviesRatedByA = set(userAprofile.keys())
     moviesRatedByB = set(userBprofile.keys())
     moviesBothUsersRated = moviesRatedByA.intersection( moviesRatedByB )
+    moviesRated = moviesRatedByA.union( moviesRatedByB )
     moviesOnlyBRated = moviesRatedByB.difference( moviesRatedByA )
 
-    if len(moviesBothUsersRated) < 2:
-        return None
-    #print colored(moviesBothUsersRated, 'yellow')
-
-    similarity = 0.0
-    seriesA = []
-    seriesB = []
-    for movie in moviesBothUsersRated:
-        #print userA['user'], 'rated', movie, userAprofile[movie]
-        #print userB['user'], 'rated', movie, userBprofile[movie]
-        seriesA.append( userAprofile[movie] )
-        seriesB.append( userBprofile[movie] )
-        similarity += userAprofile[movie] * userBprofile[movie]
-
-    #similarity = pearsonr(seriesA, seriesB)
-    #similarity = similarity[0] * len(moviesBothUsersRated)
-    #print similarity / (len(moviesBothUsersRated) * 25)
+    similarity = float( len(moviesBothUsersRated) ) / float( len(moviesRated) )
 
     return {
         'user' : userA['user'],
@@ -75,14 +54,21 @@ def computeSimilarity(twoUsers):
         'recommendations': list(moviesOnlyBRated)
     }
 
-def findKNN(userSimilarities):
+def getRecommendationsFromKNN(kNearestNeighBours):
 
-    k = 5
+    recommendations = []
+    for i, neighbour in enumerate(kNearestNeighBours):
 
-    for sim in userSimilarities:
-        print sim
+        recsFromUser = set(neighbour['recommendations'])
 
-    return userSimilarities
+        if i == 0:
+            recommendations = recsFromUser
+        else:
+            unionSet = recommendations.intersection( recsFromUser )
+            if len(unionSet) > 1:
+                recommendations = unionSet
+
+        return list( recommendations )
 
 if __name__ == '__main__':
 
@@ -101,6 +87,7 @@ if __name__ == '__main__':
     userProfiles = sc.textFile(fileName) \
         .filter(lambda line: not 'userId' in line) \
         .map(buildRatingFromLine) \
+        .filter(lambda rating: rating['rating'] == 5.0) \
         .groupBy(lambda profile: profile['user']) \
         .map(buildProfileFromGroup) \
         .cache()
@@ -113,29 +100,22 @@ if __name__ == '__main__':
     similarityGraph = userProfiles.cartesian(userProfiles) \
         .map(computeSimilarity) \
         .filter(lambda similarity: similarity != None) \
+        .filter(lambda similarity: similarity['similarity'] > 0.01) \
         .cache()
 
     # take recommendations from the most similar users
     finalRecommendations = {}
-    for userId in userIds:
+    for i, userId in enumerate(userIds):
+
+        print colored(str(i) + ': ' + userId, 'yellow')
 
         kNearestNeighBours = similarityGraph.filter(lambda rec: rec['user'] == userId) \
             .sortBy(lambda rec: rec['similarity'], ascending=False) \
             .take(10)
 
-        for neighbour in kNearestNeighBours:
+        finalRecommendations[userId] = getRecommendationsFromKNN( kNearestNeighBours )
 
-            recsFromUser = set(neighbour['recommendations'])
-
-            if not userId in finalRecommendations:
-                finalRecommendations[userId] = recsFromUser
-            else:
-                unionSet = finalRecommendations[userId].intersection( recsFromUser )
-                if len(unionSet) > 5:
-                    finalRecommendations[userId] = unionSet
-
-        finalRecommendations[userId] = list(finalRecommendations[userId])
-
+    # save to file
     print colored(finalRecommendations, 'green')
     with open(workingDir + 'recommendations.json', 'w') as outfile:
         json.dump(finalRecommendations, outfile, indent=4)
