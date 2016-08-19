@@ -13,6 +13,7 @@ Enjoy the slides directly [online](http://pieroit.github.io/machine-learning-ope
 
 - Node: Enter in `nodejs-example` and run `npm install`. Then launch with `node example.js` or `node naturalDemo.js`.
 - WordPress: Download [this repo](https://github.com/pieroit/dropout-plugin). Rename the `src` folder to `dropout` and upload it in `wp-content/plugins` as you would do with any plugin.
+- Spark: This is complicated. You should first download the MovieLens dataset and put the files in the `spark-example/data`, then submit the `spark-example/recommend.py` script to your cluster, and ask recommendations from the `spark-example/demo.py` script. contact me if you need help :)
 
 ## Live talks
 
